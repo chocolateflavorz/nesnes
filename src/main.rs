@@ -1,5 +1,8 @@
+
 use getopts::Options;
 use std::env;
+
+use nesnes::emu;
 
 fn print_usage(program: &str, opts: Options) {
     let brief = format!("Usage: {} FILE [options]", program);
@@ -29,5 +32,5 @@ fn main() {
         return;
     };
 
-    
+    emu::run(input);
 }
