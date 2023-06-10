@@ -7,4 +7,5 @@ edition = "2021"
 
 [dependencies]
 winit = "0.28"
-getopts = "0.2"
+clap = { version = "4.3", features = ["derive"] }
+virflags = "2.3"
