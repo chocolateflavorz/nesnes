@@ -1,8 +1,9 @@
-use std::fs::File;
-use std::io::Read;
-use std::io::BufReader;
 use clap::Parser;
-use nesnes::emu;
+use nesnes::emu::Emulator;
+use std::fs::File;
+use std::io::BufReader;
+use std::io::Read;
+
 #[derive(Parser)]
 struct Cli {
     rompath: Option<String>,
@@ -14,11 +15,15 @@ fn main() {
         let mut buf_reader = BufReader::new(file);
         let mut contents = Vec::new();
         buf_reader.read_to_end(&mut contents).unwrap();
-        emu::run(&contents);
     } else {
         println!("usage: nesnes [ROMFILE]");
     }
 }
 
 
-    
+#[test]
+fn test() {
+    let mut emu = Emulator::default();
+    emu.load(vec!(0x00, 0x00, 0x00, 0x00));
+    emu.run();
+}

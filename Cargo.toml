@@ -7,4 +7,6 @@ edition = "2021"
 
 [dependencies]
 winit = "0.28"
+bitflags = "2.4"
+lazy_static = "1.4"
 clap = { version = "4.3", features = ["derive"] }

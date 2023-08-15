@@ -1,11 +1,23 @@
-use crate::cpu::Cpu;
+use crate::{cpu::Cpu, mem::Mem};
 
-const MEMORY_SIZE: usize = 64 * 1024;
-struct Emulator {
+pub struct Emulator {
     cpu: Cpu,
-    mem: [u8; MEMORY_SIZE],
+    mem: Mem,
 }
 
-pub fn run(bin: &Vec<u8>) {
+impl Default for Emulator {
+    fn default() -> Self {
+        Emulator {
+            cpu: Cpu::default(),
+            mem: Mem::default(),
+        }
+    }
+}
 
+impl Emulator {
+    pub fn load(&mut self, bin: Vec<u8>) {
+        self.mem.copy_from_slice(0x8000, &bin);
+    }
+    pub fn run(&mut self) {
+    }
 }
