@@ -1,5 +1,5 @@
 use clap::Parser;
-use nesnes::emu::Emulator;
+use nesnes::emu::Emu;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::Read;
@@ -23,7 +23,7 @@ fn main() {
 
 #[test]
 fn test() {
-    let mut emu = Emulator::default();
+    let mut emu = Emu::default();
     emu.load(vec!(0x00, 0x00, 0x00, 0x00));
     emu.run();
 }

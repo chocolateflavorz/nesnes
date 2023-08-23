@@ -1,5 +1,3 @@
-mod opcodes;
-
 use bitflags::bitflags;
 
 bitflags! {
@@ -23,6 +21,23 @@ pub struct Cpu {
     pub x: u8,
     pub y: u8,
     pub p: u8,
+}
+
+impl Cpu {
+    pub fn nz_flags(&mut self, val: u8) {
+        self.sp.set(Flags::N, val & 0x80 != 0);
+        self.sp.set(Flags::Z, val == 0);
+    }
+    pub fn carry(&mut self, val: bool) {
+        self.sp.set(Flags::C, val);
+    }
+    pub fn overflow(&mut self, val: bool) {
+        self.sp.set(Flags::V, val);
+    }
+    pub fn interrupt(&mut self, val: bool) {
+        self.sp.set(Flags::I, val);
+    }
+
 }
 
 impl Default for Cpu {

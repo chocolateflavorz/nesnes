@@ -1,20 +1,20 @@
 use crate::{cpu::Cpu, mem::Mem};
 
-pub struct Emulator {
+pub struct Emu {
     cpu: Cpu,
     mem: Mem,
 }
 
-impl Default for Emulator {
+impl Default for Emu {
     fn default() -> Self {
-        Emulator {
+        Emu {
             cpu: Cpu::default(),
             mem: Mem::default(),
         }
     }
 }
 
-impl Emulator {
+impl Emu {
     pub fn load(&mut self, bin: Vec<u8>) {
         self.mem.copy_from_slice(0x8000, &bin);
     }
