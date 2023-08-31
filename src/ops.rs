@@ -79,6 +79,52 @@ fn asl(cpu: &mut Cpu, val: u8) {
     cpu.a = (val as i8).shl(1) as u8;
     cpu.nz_flags(cpu.a);
 }
+#[inline]
+fn lda (cpu: &mut Cpu, val: u8) {
+    cpu.a = val;
+    cpu.nz_flags(cpu.a);
+}
+#[inline]
+fn ldx (cpu: &mut Cpu, val: u8) {
+    cpu.x = val;
+    cpu.nz_flags(cpu.x);
+}
+#[inline]
+fn ldy (cpu: &mut Cpu, val: u8) {
+    cpu.y = val;
+    cpu.nz_flags(cpu.y);
+}
+#[inline]
+fn sta (cpu: &Cpu, mem: &mut Mem, val: u8) {
+    mem.store_u8(val, cpu.a);
+}
+#[inline]
+fn stx (cpu: &Cpu, mem: &mut Mem, val: u8) {
+    mem.store_u8(val, cpu.x);
+}
+#[inline]
+fn sty (cpu: &Cpu, mem: &mut Mem, val: u8) {
+    mem.store_u8(val, cpu.y);
+}
+fn tax_i (cpu: &mut Cpu) {
+    cpu.x = cpu.a;
+    cpu.nz_flags(cpu.a);
+}
+fn tay_i (cpu: &mut Cpu) {
+    cpu.y = cpu.a;
+    cpu.nz_flags(cpu.a);
+}
+fn tsx_i (cpu: &mut Cpu) {
+    cpu.x = cpu.sp;
+    cpu.nz_flags(cpu.sp);
+}
+fn txa_i (cpu: &mut Cpu) {
+    cpu.a = cpu.x;
+    cpu.nz_flags(cpu.x);
+}
+
+
+
 
 fn ora_ix(cpu: &mut Cpu, mem: &mut Mem) { 
     ora(cpu, mem.load_u8(indirect_x(cpu, mem))); 
