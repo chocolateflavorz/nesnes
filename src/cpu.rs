@@ -12,15 +12,13 @@ bitflags! {
     }
 }
 
-
-
 pub struct Cpu {
     pub pc: u16,
     pub sp: Flags,
     pub a: u8,
     pub x: u8,
     pub y: u8,
-    pub p: u8,
+    pub s: u8,
 }
 
 impl Cpu {
@@ -43,6 +41,9 @@ impl Cpu {
     pub fn zero_flag(&mut self, val: bool) {
         self.sp.set(Flags::Z, val);
     }
+    pub fn stack_ptr(&self) -> u16 {
+        self.s as u16 + 0x0100
+    }
 }
 
 impl Default for Cpu {
@@ -53,7 +54,7 @@ impl Default for Cpu {
             a: 0x00,
             x: 0x00,
             y: 0x00,
-            p: 0x36,
+            s: 0xff,
         }
     }
 }

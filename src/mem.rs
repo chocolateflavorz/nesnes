@@ -1,4 +1,3 @@
-
 const MEM_SIZE: usize = 0xffff;
 pub struct Mem {
     mem: [u8; MEM_SIZE],
@@ -6,9 +5,7 @@ pub struct Mem {
 
 impl Default for Mem {
     fn default() -> Self {
-        Mem {
-            mem: [0; MEM_SIZE],
-        }
+        Mem { mem: [0; MEM_SIZE] }
     }
 }
 
@@ -22,14 +19,14 @@ impl Mem {
     pub fn store_u8(&mut self, addr: u16, data: u8) {
         self.mem[addr as usize] = data;
     }
-    #[inline]  
+    #[inline]
     pub fn load_u8(&self, addr: u16) -> u8 {
         self.mem[addr as usize]
     }
     #[inline]
     pub fn store_u16(&mut self, addr: u16, data: u16) {
         let addr = addr as usize;
-        self.mem[addr..addr+1].copy_from_slice(&data.to_le_bytes());
+        self.mem[addr..addr + 1].copy_from_slice(&data.to_le_bytes());
     }
     #[inline]
     pub fn load_u16(&self, addr: u16) -> u16 {
