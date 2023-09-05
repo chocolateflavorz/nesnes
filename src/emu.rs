@@ -1,8 +1,8 @@
 use crate::{cpu::Cpu, mem::Mem};
 
 pub struct Emu {
-    cpu: Cpu,
-    mem: Mem,
+    pub cpu: Cpu,
+    pub mem: Mem,
 }
 
 impl Default for Emu {

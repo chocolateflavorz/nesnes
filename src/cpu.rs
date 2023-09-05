@@ -28,16 +28,21 @@ impl Cpu {
         self.sp.set(Flags::N, val & 0x80 != 0);
         self.sp.set(Flags::Z, val == 0);
     }
-    pub fn carry(&mut self, val: bool) {
+    pub fn carry_flag(&mut self, val: bool) {
         self.sp.set(Flags::C, val);
     }
-    pub fn overflow(&mut self, val: bool) {
+    pub fn overflow_flag(&mut self, val: bool) {
         self.sp.set(Flags::V, val);
     }
-    pub fn interrupt(&mut self, val: bool) {
+    pub fn interrupt_flag(&mut self, val: bool) {
         self.sp.set(Flags::I, val);
     }
-
+    pub fn negative_flag(&mut self, val: bool) {
+        self.sp.set(Flags::N, val);
+    }
+    pub fn zero_flag(&mut self, val: bool) {
+        self.sp.set(Flags::Z, val);
+    }
 }
 
 impl Default for Cpu {
