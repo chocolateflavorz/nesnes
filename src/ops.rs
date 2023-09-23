@@ -1,5 +1,6 @@
 #![cfg_attr(rustfmt, rustfmt_skip)]
 
+use core::prelude::rust_2015;
 use std::ops::Shl;
 use crate::cpu::Flags;
 use crate::emu::Emu;
@@ -21,11 +22,29 @@ bcc_rel, sta_iny, undef, undef, sty_zpx, sta_zpx, stx_zpy, undef, tya_i, sta_aby
 ldy_imm, lda_imm, ldx_imm, undef, ldy_zpg, lda_zpg, ldx_zpg, undef, tay_i, lda_imm, tax_i, undef, ldy_abs, lda_abs, ldx_abs, undef,
 bcs_rel, lda_iny, undef, undef, ldy_zpx, lda_zpx, ldx_zpy, undef, clv_i, lda_aby, tsx_i, undef, ldy_abx, lda_abx, ldx_aby, undef,
 cpy_imm, cmp_imm, undef, undef, cpy_zpg, cmp_zpg, dec_zpg, undef, iny_i, cmp_imm, dex_i, undef, cpy_abs, cmp_abs, dec_abs, undef,
-bne_rel, cmp_iny, undef, undef, undef, cmp_zpx, dec_zpx, undef, cld_i, cmp_aby, undef, undef, undef, cmp_abx, dec_abx, undef,
-cpx_imm, sbc_imm, undef, undef, cpx_zpg, sbc_zpg, inc_zpg, undef, inx_i, sbc_imm, nop_i, undef, cpx_abs, sbc_abs, inc_abs, undef,
-beq_rel, sbc_iny, undef, undef, undef, sbc_zpx, inc_zpx, undef, sed_i, sbc_aby, undef, undef, undef, sbc_abx, inc_abx, undef
+bne_rel, cmp_iny, undef, undef, undef, cmp_zpx, dec_zpx, undef, undef, cmp_aby, undef, undef, undef, cmp_abx, dec_abx, undef,
+cpx_imm, sbc_imm, undef, undef, cpx_zpg, sbc_zpg, inc_zpg, undef, inx_i, sbc_imm, nop, undef, cpx_abs, sbc_abs, inc_abs, undef,
+beq_rel, sbc_iny, undef, undef, undef, sbc_zpx, inc_zpx, undef, undef, sbc_aby, undef, undef, undef, sbc_abx, inc_abx, undef
 ];
-pub const OP_CYCLE: [u8; 0] = [];
+#[rustfmt::skip]
+pub const OP_CYCLE: [u8; 256] = [
+2, 6, 0, 0, 0, 3, 5, 0, 3, 2, 2, 0, 0, 4, 6, 0,
+2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,
+6, 6, 0, 0, 3, 3, 5, 0, 4, 2, 2, 0, 4, 4, 6, 0,
+2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,
+6, 6, 0, 0, 0, 3, 5, 0, 2, 2, 2, 0, 4, 4, 6, 0,
+2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,
+6, 6, 0, 0, 0, 3, 5, 0, 2, 2, 2, 0, 3, 4, 6, 0,
+2, 5, 0, 0, 0, 4, 6, 0, 2, 4, 0, 0, 0, 4, 7, 0,
+6, 6, 0, 0, 3, 3, 3, 0, 2, 2, 2, 0, 3, 4, 4, 0,
+2, 6, 0, 0, 4, 4, 4, 0, 2, 5, 2, 0, 4, 4, 4, 0,
+2, 6, 0, 0, 3, 3, 5, 0, 2, 2, 2, 0, 3, 4, 4, 0,
+2, 5, 0, 0, 4, 4, 6, 0, 2, 4, 2, 0, 4, 4, 4, 0,
+2, 6, 0, 0, 3, 3, 5, 0, 2, 2, 2, 0, 3, 4, 4, 0,
+2, 5, 0, 0, 4, 4, 6, 0, 0, 4, 2, 0, 4, 4, 4, 0,
+2, 6, 0, 0, 3, 3, 5, 0, 2, 2, 2, 0, 3, 4, 4, 0,
+2, 5, 0, 0, 4, 4, 6, 0, 0, 4, 2, 0, 4, 4, 4, 0
+];
 pub const OP_NAME: [&'static str; 0] = [];
 
 
