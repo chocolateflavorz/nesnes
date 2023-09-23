@@ -1,6 +1,5 @@
 #![cfg_attr(rustfmt, rustfmt_skip)]
 
-use core::prelude::rust_2015;
 use std::ops::Shl;
 use crate::cpu::Flags;
 use crate::emu::Emu;
