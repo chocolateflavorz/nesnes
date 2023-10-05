@@ -8,7 +8,7 @@ pub type Behaviour = fn(&mut Emu);
 
 #[rustfmt::skip]
 pub const OP_FUNC: [Behaviour; 256] = 
-[brk, ora, undef, undef, undef, ora_zpg, asl_zpg, undef, php_i, ora_imm, asl_i, undef, undef, ora_abs, asl_abs, undef,
+[brk, ora_inx, undef, undef, undef, ora_zpg, asl_zpg, undef, php_i, ora_imm, asl_i, undef, undef, ora_abs, asl_abs, undef,
 bpl_rel, ora_iny, undef, undef, undef, ora_zpx, asl_zpx, undef, clc_i, ora_aby, undef, undef, undef, ora_abx, asl_abx, undef,
 jsr_abs, and_imm, undef, undef, bit_zpg, and_zpg, rol_zpg, undef, plp_i, and_imm, rol_i, undef, bit_abs, and_abs, rol_abs, undef,
 bmi_rel, and_iny, undef, undef, undef, and_zpx, rol_zpx, undef, sec_i, and_aby, undef, undef, undef, and_abx, rol_abx, undef,
@@ -324,7 +324,7 @@ pub fn  iny_i (emu: &mut Emu) {
     emu.cpu.pc += 1;
 }
 pub fn  lsr_i (emu: &mut Emu) {
-    let val = cpu.a;
+    let val = emu.cpu.a;
     emu.cpu.carry_flag(val & 0x01 != 0);
     emu.cpu.a = val >> 1;
     emu.cpu.nz_flags(emu.cpu.a);
