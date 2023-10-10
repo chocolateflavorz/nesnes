@@ -12,7 +12,7 @@ impl Default for Mem {
 impl Mem {
     #[inline]
     pub fn copy_from_slice(&mut self, offset: usize, slice: &[u8]) {
-        self.mem[offset..slice.len()].copy_from_slice(slice);
+        self.mem[offset..offset + slice.len()].copy_from_slice(slice);
     }
 
     #[inline]

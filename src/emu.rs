@@ -1,13 +1,19 @@
 use crate::{cpu::Cpu, mem::Mem};
+
+use std::thread::sleep;
+use std::time::{Duration, Instant};
+
 use winit::{
+    dpi::LogicalSize,
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    window::{WindowBuilder, Window}, dpi::LogicalSize,
-};  
+    window::{Window, WindowBuilder},
+};
 
-const WIDTH: u32  = 24;
+const WIDTH: u32 = 24;
 const HEIGHT: u32 = 24;
-const SCALE: f64  = 30.0;
+const SCALE: f64 = 30.0;
+
 pub struct Emu {
     pub stat: Stat,
     pub cpu: Cpu,
@@ -42,11 +48,14 @@ impl Emu {
     pub fn load(&mut self, bin: Vec<u8>) {
         self.mem.copy_from_slice(0x8000, &bin);
     }
-    pub fn run(&mut self) {
+    pub fn render(&mut self) {
+        println!("Gekki form render");
+    }
+    pub fn run(mut self) {
         let event_loop = EventLoop::new();
         let window = {
-            let size = LogicalSize::new( WIDTH as f64, HEIGHT as f64);
-            let scaled_size = LogicalSize::new( WIDTH as f64 * SCALE, HEIGHT as f64 * SCALE);
+            let size = LogicalSize::new(WIDTH as f64, HEIGHT as f64);
+            let scaled_size = LogicalSize::new(WIDTH as f64 * SCALE, HEIGHT as f64 * SCALE);
             WindowBuilder::new()
                 .with_title("EASY2A03")
                 .with_inner_size(size)
@@ -54,16 +63,30 @@ impl Emu {
                 .build(&event_loop)
                 .unwrap()
         };
+
+        let wakeup = Instant::now();
+        let mut last_time = Instant::now();
+        let mut time_acc = 0.0f32;
+        const FRAME_TIME: f32 = 1.0 / 24.0;
+
         event_loop.run(move |event, _, control_flow| {
             control_flow.set_poll();
-            control_flow.set_wait();
+            let elapsed = last_time.elapsed().as_secs_f32();
+            time_acc += elapsed;
+            last_time = Instant::now();
+            if time_acc >= FRAME_TIME {
+                time_acc -= FRAME_TIME;
+                self.stat.frame_counter += 1;
+                self.render();
+                sleep(Duration::from_millis(1));
+            }
             match event {
                 Event::WindowEvent {
                     event: WindowEvent::CloseRequested,
                     ..
                 } => {
                     control_flow.set_exit();
-                },
+                }
                 _ => (),
             }
         });

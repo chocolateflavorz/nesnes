@@ -1,4 +1,5 @@
 use clap::Parser;
+use nesnes::emu::Emu;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::Read;
@@ -17,11 +18,11 @@ fn main() {
     } else {
         println!("usage: nesnes [ROMFILE]");
     }
+
+    test();
 }
 
-#[test]
 fn test() {
-    use nesnes::emu::Emu;
     let mut emu = Emu::default();
     emu.load(vec![0x00, 0x00, 0x00, 0x00]);
     emu.run();
