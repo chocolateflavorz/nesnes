@@ -10,6 +10,8 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 
+use pixels::{Pixels, PixelsBuilder,SurfaceTexture};
+
 const WIDTH: u32 = 24;
 const HEIGHT: u32 = 24;
 const SCALE: f64 = 30.0;
@@ -48,8 +50,22 @@ impl Emu {
     pub fn load(&mut self, bin: Vec<u8>) {
         self.mem.copy_from_slice(0x8000, &bin);
     }
-    pub fn render(&mut self) {
-        println!("Gekki form render");
+    pub fn loadeasy(&mut self, bin: Vec<u8>) {
+        self.mem.copy_from_slice(0x0600, &bin);
+    }
+    pub fn render_easy(&self, f: &mut [u8]) {
+        for (i, c) in self.mem.get_frame_easy().iter().enumerate() {
+            let offset = i * 4;
+            let color = match c {
+                0 => [0x00, 0x00, 0x00, 0xff],
+                1 => [0xff, 0xff, 0xff, 0xff],
+                2 => [0x00, 0x00, 0xff, 0xff],
+                3 => [0xff, 0x00, 0x00, 0xff],
+                4 => [0x00, 0xff, 0x00, 0xff],
+                _ => [0xff, 0x00, 0xff, 0xff],
+            };
+            f[offset..offset + 4].copy_from_slice(&color);
+        }
     }
     pub fn run(mut self) {
         let event_loop = EventLoop::new();
@@ -64,10 +80,24 @@ impl Emu {
                 .unwrap()
         };
 
-        let wakeup = Instant::now();
+        let mut pixels = {
+            let window_size = window.inner_size();
+            let surface_texture = SurfaceTexture::new(
+                window_size.width,
+                window_size.height,
+                &window,
+            );
+            PixelsBuilder::new(WIDTH, HEIGHT, surface_texture)
+                .surface_texture_format(pixels::wgpu::TextureFormat::Rgba8Uint)
+                .build()
+                .unwrap()
+        };
+
         let mut last_time = Instant::now();
         let mut time_acc = 0.0f32;
         const FRAME_TIME: f32 = 1.0 / 24.0;
+
+
 
         event_loop.run(move |event, _, control_flow| {
             control_flow.set_poll();
@@ -77,8 +107,10 @@ impl Emu {
             if time_acc >= FRAME_TIME {
                 time_acc -= FRAME_TIME;
                 self.stat.frame_counter += 1;
-                self.render();
-                sleep(Duration::from_millis(1));
+                //self.cpu.run(&mut self.mem, &mut self.stat);
+                self.render_easy(pixels.frame_mut());
+                pixels.render().expect("render failed");
+                sleep(Duration::from_millis(10));
             }
             match event {
                 Event::WindowEvent {

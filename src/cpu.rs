@@ -46,6 +46,12 @@ impl Cpu {
     }
 }
 
+impl Cpu {
+    pub fn run_thread() -> Result<(), String> {
+        Ok(())
+    }    
+}
+
 impl Default for Cpu {
     fn default() -> Self {
         Cpu {

@@ -32,4 +32,8 @@ impl Mem {
     pub fn load_u16(&self, addr: u16) -> u16 {
         (self.mem[addr as usize] as u16) << 8 | self.mem[addr as usize + 1] as u16
     }
+    #[inline]
+    pub fn get_frame_easy(&self) -> &[u8] {
+        &self.mem[0x200..0x600]
+    }
 }

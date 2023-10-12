@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 winit = "0.28"
 pixels = "0.13"
+gilrs = "0.10"
 lazy_static = "1.4"
 bitflags = "2.4"
 clap = { version = "4.3", features = ["derive"] }
