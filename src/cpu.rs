@@ -1,8 +1,10 @@
 use bitflags::bitflags;
+use log::debug;
 
 use crate::emu::Emu;
 use crate::ops::OP_CYCLE;
 use crate::ops::OP_FUNC;
+use crate::ops::OP_NAME;
 //use crate::ops::OP_NAME;
 
 bitflags! {
@@ -53,11 +55,15 @@ impl Cpu {
 
 impl Emu {
     pub fn run_cpu_once(emu: &mut Emu) {
+        
         let op = emu.mem.load_u8(emu.cpu.pc);
+        debug!("CPU at{:04x}: {} {:02x}", emu.cpu.pc, OP_NAME[op as usize], op);
         let f = OP_FUNC[op as usize];
         let c = OP_CYCLE[op as usize];
         f(emu);
         emu.stat.cycle_counter += c as u32;
+
+        
     }
     pub fn run_cpu_until(emu: &mut Emu, clocks: u32) {
         while emu.stat.cycle_counter < clocks {

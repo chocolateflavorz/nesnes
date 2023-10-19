@@ -2,18 +2,18 @@ use crate::{cpu::Cpu, mem::Mem};
 
 use std::thread::sleep;
 use std::time::{Duration, Instant};
-
+use log::{debug};
 use winit::{
     dpi::LogicalSize,
     event::{Event, WindowEvent},
-    event_loop::{ControlFlow, EventLoop},
-    window::{Window, WindowBuilder},
+    event_loop::{EventLoop},
+    window::{WindowBuilder},
 };
 
-use pixels::{Pixels, PixelsBuilder,SurfaceTexture};
+use pixels::{PixelsBuilder,SurfaceTexture};
 
-const WIDTH: u32 = 24;
-const HEIGHT: u32 = 24;
+const WIDTH: u32 = 32;
+const HEIGHT: u32 = 32;
 const SCALE: f64 = 30.0;
 
 pub struct Emu {
@@ -52,6 +52,7 @@ impl Emu {
     }
     pub fn loadeasy(&mut self, bin: Vec<u8>) {
         self.mem.copy_from_slice(0x0600, &bin);
+        self.cpu.pc = 0x0600;
     }
     pub fn render_easy(&self, f: &mut [u8]) {
         for (i, c) in self.mem.get_frame_easy().iter().enumerate() {
@@ -92,6 +93,8 @@ impl Emu {
                 .build()
                 .unwrap()
         };
+
+        debug!("frame len {}", pixels.frame().len());
 
         let mut last_time = Instant::now();
         let mut time_acc = 0.0f32;

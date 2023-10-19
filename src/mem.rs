@@ -1,3 +1,5 @@
+use std::ops::Shl;
+
 const MEM_SIZE: usize = 0xffff;
 pub struct Mem {
     mem: [u8; MEM_SIZE],
@@ -12,7 +14,7 @@ impl Default for Mem {
 impl Mem {
     #[inline]
     pub fn copy_from_slice(&mut self, offset: usize, slice: &[u8]) {
-        self.mem[offset..offset + slice.len() - 1].copy_from_slice(slice);
+        self.mem[offset..offset + slice.len()].copy_from_slice(slice);
     }
 
     #[inline]
@@ -26,11 +28,11 @@ impl Mem {
     #[inline]
     pub fn store_u16(&mut self, addr: u16, data: u16) {
         let addr = addr as usize;
-        self.mem[addr..addr + 1].copy_from_slice(&data.to_le_bytes());
+        self.mem[addr..=addr + 1].copy_from_slice(&data.to_le_bytes());
     }
     #[inline]
     pub fn load_u16(&self, addr: u16) -> u16 {
-        (self.mem[addr as usize] as u16) << 8 | self.mem[addr as usize + 1] as u16
+        self.mem[addr as usize] as u16 | (self.mem[addr as usize + 1] as u16) << 8
     }
     #[inline]
     pub fn get_frame_easy(&self) -> &[u8] {

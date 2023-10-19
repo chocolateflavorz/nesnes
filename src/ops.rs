@@ -44,7 +44,24 @@ pub const OP_CYCLE: [u8; 256] = [
 2, 6, 0, 0, 3, 3, 5, 0, 2, 2, 2, 0, 3, 4, 4, 0,
 2, 5, 0, 0, 4, 4, 6, 0, 0, 4, 2, 0, 4, 4, 4, 0
 ];
-pub const OP_NAME: [&'static str; 0] = [];
+pub const OP_NAME: [&'static str; 256] = [
+"brk", "ora", "undef", "undef", "undef", "ora", "asl", "undef", "php", "ora", "asl", "undef", "undef", "ora", "asl", "undef",
+"bpl", "ora", "undef", "undef", "undef", "ora", "asl", "undef", "clc", "ora", "undef", "undef", "undef", "ora", "asl", "undef",
+"jsr", "and", "undef", "undef", "bit", "and", "rol", "undef", "plp", "and", "rol", "undef", "bit", "and", "rol", "undef",
+"bmi", "and", "undef", "undef", "undef", "and", "rol", "undef", "sec", "and", "undef", "undef", "undef", "and", "rol", "undef",
+"rti", "eor", "undef", "undef", "undef", "eor", "lsr", "undef", "pha", "eor", "lsr", "undef", "jmp", "eor", "lsr", "undef",
+"bvc", "eor", "undef", "undef", "undef", "eor", "lsr", "undef", "cli", "eor", "undef", "undef", "undef", "eor", "lsr", "undef",
+"rts", "adc", "undef", "undef", "undef", "adc", "ror", "undef", "pla", "adc", "ror", "undef", "jmp", "adc", "ror", "undef",
+"bvs", "adc", "undef", "undef", "undef", "adc", "ror", "undef", "sei", "adc", "undef", "undef", "undef", "adc", "ror", "undef",
+"undef", "sta", "undef", "undef", "sty", "sta", "stx", "undef", "dey", "undef", "txa", "undef", "sty", "sta", "stx", "undef",
+"bcc", "sta", "undef", "undef", "sty", "sta", "stx", "undef", "tya", "sta", "txs", "undef", "undef", "sta", "undef", "undef",
+"ldy", "lda", "ldx", "undef", "ldy", "lda", "ldx", "undef", "tay", "lda", "tax", "undef", "ldy", "lda", "ldx", "undef",
+"bcs", "lda", "undef", "undef", "ldy", "lda", "ldx", "undef", "clv", "lda", "tsx", "undef", "ldy", "lda", "ldx", "undef",
+"cpy", "cmp", "undef", "undef", "cpy", "cmp", "dec", "undef", "iny", "cmp", "dex", "undef", "cpy", "cmp", "dec", "undef",
+"bne", "cmp", "undef", "undef", "undef", "cmp", "dec", "undef", "cld", "cmp", "undef", "undef", "undef", "cmp", "dec", "undef",
+"cpx", "sbc", "undef", "undef", "cpx", "sbc", "inc", "undef", "inx", "sbc", "nop", "undef", "cpx", "sbc", "inc", "undef",
+"beq", "sbc", "undef", "undef", "undef", "sbc", "inc", "undef", "sed", "sbc", "undef", "undef", "undef", "sbc", "inc", "undef"
+];
 
 
 mod addressing {
@@ -127,7 +144,7 @@ fn branch(emu: &mut Emu, cond: bool) {
         }
 }
 
-pub fn  undef(emu: &mut Emu) {
+pub fn  undef(_emu: &mut Emu) {
 }
 pub fn  brk (emu: &mut Emu) {
     stack::push_u16(emu, emu.cpu.pc + 1);

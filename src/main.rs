@@ -10,6 +10,7 @@ struct Cli {
 }
 
 fn main() {
+    env_logger::init();
     if let Some(path) = Cli::parse().rompath {
         let file = File::open(path).unwrap();
         let mut buf_reader = BufReader::new(file);
@@ -46,6 +47,6 @@ fn test() {
     0xea, 0xca, 0xd0, 0xfb, 0x60
 ];
     let mut emu = Emu::default();
-    emu.load(game_code);
+    emu.loadeasy(game_code);
     emu.run();
 }
