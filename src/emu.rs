@@ -88,7 +88,7 @@ impl Emu {
                 &window,
             );
             PixelsBuilder::new(WIDTH, HEIGHT, surface_texture)
-                .surface_texture_format(pixels::wgpu::TextureFormat::Rgba8Uint)
+                .surface_texture_format(pixels::wgpu::TextureFormat::Bgra8UnormSrgb)
                 .build()
                 .unwrap()
         };
@@ -107,7 +107,7 @@ impl Emu {
             if time_acc >= FRAME_TIME {
                 time_acc -= FRAME_TIME;
                 self.stat.frame_counter += 1;
-                //self.cpu.run(&mut self.mem, &mut self.stat);
+                Emu::run_cpu_until(&mut self, 128);
                 self.render_easy(pixels.frame_mut());
                 pixels.render().expect("render failed");
                 sleep(Duration::from_millis(10));
