@@ -106,7 +106,7 @@ mod addressing {
     }
     #[inline]
     pub fn relative(emu: &Emu) -> u16 {
-        emu.cpu.pc + 2 + emu.mem.load_u8(emu.cpu.pc+1) as u16
+        (emu.cpu.pc as i16 + 2 + ((emu.mem.load_u8(emu.cpu.pc+1) as i8) as i16)) as u16
     }
 } // mod addressing
 
@@ -286,7 +286,7 @@ pub fn  sbc(emu: &mut Emu, val: u8) {
     let (r_c, v_c) = r_a.overflowing_sub((!emu.cpu.sp.contains(Flags::C)).into());
     emu.cpu.overflow_flag((r_c ^ emu.cpu.a) & 0x80 != 0);
     emu.cpu.a = r_c;
-    emu.cpu.carry_flag(v_a || v_c);
+    emu.cpu.carry_flag(!(v_a || v_c));
     emu.cpu.nz_flags(emu.cpu.a);
 }
 

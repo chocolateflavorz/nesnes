@@ -1,5 +1,6 @@
 use bitflags::bitflags;
 use log::debug;
+use log::info;
 
 use crate::emu::Emu;
 use crate::ops::OP_CYCLE;
@@ -54,19 +55,23 @@ impl Cpu {
 }
 
 impl Emu {
-    pub fn run_cpu_once(emu: &mut Emu) {
-        
+    pub fn cpuinfo(emu: &Emu) {
         let op = emu.mem.load_u8(emu.cpu.pc);
-        debug!("CPU at{:04x}: {} {:02x}", emu.cpu.pc, OP_NAME[op as usize], op);
+        info!("CPU at{:04x}: {} {:02x} {:02x} {:02x} stat: A:{:02x} X:{:02x} Y:{:02x} FLAG:{:02x} S:{:02x}",
+            emu.cpu.pc, OP_NAME[op as usize], op, emu.mem.load_u8(emu.cpu.pc+1),emu.mem.load_u8(emu.cpu.pc+2),
+            emu.cpu.a, emu.cpu.x, emu.cpu.y, emu.cpu.sp.bits(), emu.cpu.s);
+    }
+    pub fn run_cpu_once(emu: &mut Emu) {
+        //Self::cpuinfo(emu);
+        let op = emu.mem.load_u8(emu.cpu.pc);
         let f = OP_FUNC[op as usize];
         let c = OP_CYCLE[op as usize];
         f(emu);
         emu.stat.cycle_counter += c as u32;
-
-        
     }
-    pub fn run_cpu_until(emu: &mut Emu, clocks: u32) {
-        while emu.stat.cycle_counter < clocks {
+    pub fn run_cpu_clocks(emu: &mut Emu, clocks: u32) {
+        let c = emu.stat.cycle_counter;
+        while emu.stat.cycle_counter < c + clocks {
             Self::run_cpu_once(emu);
         }
     }

@@ -1,8 +1,6 @@
-use std::ops::Shl;
-
 const MEM_SIZE: usize = 0xffff;
 pub struct Mem {
-    mem: [u8; MEM_SIZE],
+    pub(crate) mem: [u8; MEM_SIZE],
 }
 
 impl Default for Mem {
@@ -33,9 +31,5 @@ impl Mem {
     #[inline]
     pub fn load_u16(&self, addr: u16) -> u16 {
         self.mem[addr as usize] as u16 | (self.mem[addr as usize + 1] as u16) << 8
-    }
-    #[inline]
-    pub fn get_frame_easy(&self) -> &[u8] {
-        &self.mem[0x200..0x600]
     }
 }
