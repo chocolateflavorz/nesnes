@@ -1,3 +1,4 @@
+use crate::cart::Rom;
 use crate::{cpu::Cpu, mem::Mem};
 
 use log::debug;
@@ -48,6 +49,13 @@ impl Stat {
 
 impl Emu {
     pub fn load(&mut self, bin: Vec<u8>) {
-        self.mem.copy_from_slice(0x8000, &bin);
+        match Rom::from_raw(&bin) {
+            Ok(rom) => {
+                self.mem.set_rom(rom);
+            }
+            Err(e) => {
+                panic!("error when loading rom : {}", e);
+            }
+        }
     }
 }
