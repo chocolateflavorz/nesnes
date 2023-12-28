@@ -26,6 +26,7 @@ pub struct Emu {
 pub struct Stat {
     pub cycle_counter: u32,
     pub frame_counter: u32,
+    pub operand: String,
 }
 
 impl Default for Emu {
@@ -43,6 +44,7 @@ impl Stat {
         Stat {
             cycle_counter: 0,
             frame_counter: 0,
+            operand: String::with_capacity(8),
         }
     }
 }

@@ -1,8 +1,10 @@
 use clap::Parser;
+use flexi_logger::{FileSpec, Logger, WriteMode};
 use nesnes::emu::Emu;
 use std::fs::File;
 use std::io::BufReader;
 use std::io::Read;
+use std::io::Write as _;
 
 #[derive(Parser)]
 struct Cli {
@@ -10,7 +12,12 @@ struct Cli {
 }
 
 fn main() {
-    env_logger::init();
+    //env_logger::init();
+    let _logger = Logger::try_with_str("nesnes::cpu=debug").unwrap()
+        .log_to_file(FileSpec::default().suppress_timestamp())
+        .write_mode(WriteMode::BufferAndFlush)
+        .start().unwrap();
+    /* 
     if let Some(path) = Cli::parse().rompath {
         let file = File::open(path).unwrap();
         let mut buf_reader = BufReader::new(file);
@@ -19,11 +26,13 @@ fn main() {
     } else {
         println!("usage: nesnes [ROMFILE]");
     }
+    */
 
-    test();
+    cpu_test();
 }
 
-fn test() {
+
+fn easy6502_test() {
     let game_code = vec![
         0x20, 0x06, 0x06, 0x20, 0x38, 0x06, 0x20, 0x0d, 0x06, 0x20, 0x2a, 0x06, 0x60, 0xa9, 0x02,
         0x85, 0x02, 0xa9, 0x04, 0x85, 0x03, 0xa9, 0x11, 0x85, 0x10, 0xa9, 0x10, 0x85, 0x12, 0xa9,
@@ -50,4 +59,18 @@ fn test() {
     let mut emu = Emu::default();
     emu.load_easy(game_code);
     emu.run_easy();
+}
+
+fn cpu_test() {
+    let cart = include_bytes!("../nestest.nes");
+    let mut emu = Emu::default();
+    emu.load(cart.to_vec());
+    emu.cpu.pc = 0xc000;
+    emu.run_cpu_with_callback(8192, |e| {
+        Emu::cpudebug_for_test(e);
+        if e.cpu.pc == 0xdbb5 {
+            use pretty_hex::*;                    let mut file = std::fs::File::create("dbb5mem.txt").unwrap();
+                    file.write(format!("{:?}", e.mem.mem[0x000..02000].hex_dump()).to_string().as_bytes()).expect("FUCKWRITER");
+        }
+});
 }

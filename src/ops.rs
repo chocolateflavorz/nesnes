@@ -1,6 +1,6 @@
 #![cfg_attr(rustfmt, rustfmt_skip)]
 
-use std::ops::Shl;
+use std::ops::{Shl, Not};
 use crate::cpu::Flags;
 use crate::emu::Emu;
 
@@ -8,22 +8,23 @@ pub type Behaviour = fn(&mut Emu);
 
 #[rustfmt::skip]
 pub const OP_FUNC: [Behaviour; 256] = 
-[brk, ora_inx, undef, undef, undef, ora_zpg, asl_zpg, undef, php_i, ora_imm, asl_i, undef, undef, ora_abs, asl_abs, undef,
-bpl_rel, ora_iny, undef, undef, undef, ora_zpx, asl_zpx, undef, clc_i, ora_aby, undef, undef, undef, ora_abx, asl_abx, undef,
-jsr_abs, and_imm, undef, undef, bit_zpg, and_zpg, rol_zpg, undef, plp_i, and_imm, rol_i, undef, bit_abs, and_abs, rol_abs, undef,
-bmi_rel, and_iny, undef, undef, undef, and_zpx, rol_zpx, undef, sec_i, and_aby, undef, undef, undef, and_abx, rol_abx, undef,
-rti_i, eor_imm, undef, undef, undef, eor_zpg, lsr_zpg, undef, pha_i, eor_imm, lsr_i, undef, jmp_abs, eor_abs, lsr_abs, undef,
-bvc_rel, eor_iny, undef, undef, undef, eor_zpx, lsr_zpx, undef, cli_i, eor_aby, undef, undef, undef, eor_abx, lsr_abx, undef,
-rts_i, adc_imm, undef, undef, undef, adc_zpg, ror_zpg, undef, pla_i, adc_imm, ror_i, undef, jmp_ind, adc_abs, ror_abs, undef,
-bvs_rel, adc_iny, undef, undef, undef, adc_zpx, ror_zpx, undef, sei_i, adc_aby, undef, undef, undef, adc_abx, ror_abx, undef,
-undef, sta_inx, undef, undef, sty_zpg, sta_zpg, stx_zpg, undef, dey_i, undef, txa_i, undef, sty_abs, sta_abs, stx_abs, undef,
-bcc_rel, sta_iny, undef, undef, sty_zpx, sta_zpx, stx_zpy, undef, tya_i, sta_aby, txs_i, undef, undef, sta_abx, undef, undef,
-ldy_imm, lda_imm, ldx_imm, undef, ldy_zpg, lda_zpg, ldx_zpg, undef, tay_i, lda_imm, tax_i, undef, ldy_abs, lda_abs, ldx_abs, undef,
-bcs_rel, lda_iny, undef, undef, ldy_zpx, lda_zpx, ldx_zpy, undef, clv_i, lda_aby, tsx_i, undef, ldy_abx, lda_abx, ldx_aby, undef,
-cpy_imm, cmp_imm, undef, undef, cpy_zpg, cmp_zpg, dec_zpg, undef, iny_i, cmp_imm, dex_i, undef, cpy_abs, cmp_abs, dec_abs, undef,
-bne_rel, cmp_iny, undef, undef, undef, cmp_zpx, dec_zpx, undef, undef, cmp_aby, undef, undef, undef, cmp_abx, dec_abx, undef,
-cpx_imm, sbc_imm, undef, undef, cpx_zpg, sbc_zpg, inc_zpg, undef, inx_i, sbc_imm, nop, undef, cpx_abs, sbc_abs, inc_abs, undef,
-beq_rel, sbc_iny, undef, undef, undef, sbc_zpx, inc_zpx, undef, undef, sbc_aby, undef, undef, undef, sbc_abx, inc_abx, undef
+//        0       1      2         3      4        5       6         7      8     9      A        B      C        D       E         F
+[/*0*/ brk,     ora_inx, undef,   undef, undef,   ora_zpg, asl_zpg, undef, php_i, ora_imm, asl_i, undef, undef,   ora_abs, asl_abs, undef,
+ /*1*/ bpl_rel, ora_iny, undef,   undef, undef,   ora_zpx, asl_zpx, undef, clc_i, ora_aby, undef, undef, undef,   ora_abx, asl_abx, undef,
+ /*2*/ jsr_abs, and_inx, undef,   undef, bit_zpg, and_zpg, rol_zpg, undef, plp_i, and_imm, rol_i, undef, bit_abs, and_abs, rol_abs, undef,
+ /*3*/ bmi_rel, and_iny, undef,   undef, undef,   and_zpx, rol_zpx, undef, sec_i, and_aby, undef, undef, undef,   and_abx, rol_abx, undef,
+ /*4*/ rti_i,   eor_inx, undef,   undef, undef,   eor_zpg, lsr_zpg, undef, pha_i, eor_imm, lsr_i, undef, jmp_abs, eor_abs, lsr_abs, undef,
+ /*5*/ bvc_rel, eor_iny, undef,   undef, undef,   eor_zpx, lsr_zpx, undef, cli_i, eor_aby, undef, undef, undef,   eor_abx, lsr_abx, undef,
+ /*6*/ rts_i,   adc_inx, undef,   undef, undef,   adc_zpg, ror_zpg, undef, pla_i, adc_imm, ror_i, undef, jmp_ind, adc_abs, ror_abs, undef,
+ /*7*/ bvs_rel, adc_iny, undef,   undef, undef,   adc_zpx, ror_zpx, undef, sei_i, adc_aby, undef, undef, undef,   adc_abx, ror_abx, undef,
+ /*8*/ undef,   sta_inx, undef,   undef, sty_zpg, sta_zpg, stx_zpg, undef, dey_i, undef,   txa_i, undef, sty_abs, sta_abs, stx_abs, undef,
+ /*9*/ bcc_rel, sta_iny, undef,   undef, sty_zpx, sta_zpx, stx_zpy, undef, tya_i, sta_aby, txs_i, undef, undef,   sta_abx, undef,   undef,
+ /*A*/ ldy_imm, lda_inx, ldx_imm, undef, ldy_zpg, lda_zpg, ldx_zpg, undef, tay_i, lda_imm, tax_i, undef, ldy_abs, lda_abs, ldx_abs, undef,
+ /*B*/ bcs_rel, lda_iny, undef,   undef, ldy_zpx, lda_zpx, ldx_zpy, undef, clv_i, lda_aby, tsx_i, undef, ldy_abx, lda_abx, ldx_aby, undef,
+ /*C*/ cpy_imm, cmp_inx, undef,   undef, cpy_zpg, cmp_zpg, dec_zpg, undef, iny_i, cmp_imm, dex_i, undef, cpy_abs, cmp_abs, dec_abs, undef,
+ /*D*/ bne_rel, cmp_iny, undef,   undef, undef,   cmp_zpx, dec_zpx, undef, cld_i, cmp_aby, undef, undef, undef,   cmp_abx, dec_abx, undef,
+ /*E*/ cpx_imm, sbc_inx, undef,   undef, cpx_zpg, sbc_zpg, inc_zpg, undef, inx_i, sbc_imm, nop,   undef, cpx_abs, sbc_abs, inc_abs, undef,
+ /*F*/ beq_rel, sbc_iny, undef,   undef, undef,   sbc_zpx, inc_zpx, undef, sed_i, sbc_aby, undef, undef, undef,   sbc_abx, inc_abx, undef
 ];
 #[rustfmt::skip]
 pub const OP_CYCLE: [u8; 256] = [
@@ -64,49 +65,73 @@ pub const OP_NAME: [&'static str; 256] = [
 ];
 
 
+
 mod addressing {
+    use log::debug;
+
     use crate::emu::Emu;
     #[inline] 
     pub fn immediate (emu: &Emu) -> u16{ 
-        emu.cpu.pc + 1
+        let r =emu.cpu.pc + 1;
+        debug!("#${:02x}", emu.mem.load_u8(r));
+        r
     }
     #[inline] 
     pub fn zeropage(emu: &Emu) -> u16 { 
-      emu.mem.load_u8(emu.cpu.pc+1) as u16 
+      let r = emu.mem.load_u8(emu.cpu.pc+1) as u16;
+      debug!("${:02x} = {:02x}", r, emu.mem.load_u8(r));
+        r
     }
     #[inline]
     pub fn zeropage_x(emu: &Emu) -> u16 {
-      emu.mem.load_u8(emu.cpu.pc+1).wrapping_add(emu.cpu.x) as u16 
+      let r = emu.mem.load_u8(emu.cpu.pc+1).wrapping_add(emu.cpu.x) as u16;
+        debug!("${:02x},X @ {:02x} = {:02x}", emu.mem.load_u8(emu.cpu.pc+1), r, emu.mem.load_u8(r));
+        r
     }
     #[inline]
     pub fn zeropage_y(emu: &Emu) -> u16 {
-      emu.mem.load_u8(emu.cpu.pc+1).wrapping_add(emu.cpu.y) as u16 
+      let r = emu.mem.load_u8(emu.cpu.pc+1).wrapping_add(emu.cpu.y) as u16 ;
+        debug!("${:02x},Y @ {:02x} = {:02x}", emu.mem.load_u8(emu.cpu.pc+1), r, emu.mem.load_u8(r));
+        r
     }
     #[inline] 
     pub fn absolute(emu: &Emu) -> u16 {
-        emu.mem.load_u16(emu.cpu.pc+1) 
+        let r = emu.mem.load_u16(emu.cpu.pc+1) ;
+        debug!("abs ${:04x} = {:04x} = {:04x}", emu.cpu.pc+1, r, emu.mem.load_u16(r));
+        r
     }
     #[inline] 
     pub fn absolute_x(emu: &Emu) -> u16 {
-        emu.mem.load_u16(emu.mem.load_u16(emu.cpu.pc+1)).wrapping_add(emu.cpu.x as u16) 
+        let r =  emu.mem.load_u16(emu.cpu.pc+1).wrapping_add(emu.cpu.x as u16) ;
+        debug!("${:04x},X @ {:04x} = {:02x}", emu.mem.load_u16(emu.cpu.pc+1), r, emu.mem.load_u8(r));
+        r
     }
     #[inline]
     pub fn absolute_y(emu: &Emu) -> u16 {
-        emu.mem.load_u16(emu.mem.load_u16(emu.cpu.pc+1)).wrapping_add(emu.cpu.y as u16) 
+        let r = emu.mem.load_u16(emu.cpu.pc+1).wrapping_add(emu.cpu.y as u16);
+        debug!("${:04x},Y @ {:04x} = {:02x}", emu.mem.load_u16(emu.cpu.pc+1), r, emu.mem.load_u8(r));
+        r
     }
     #[inline]
     pub fn indirect_x(emu: &Emu) -> u16 {
         let addr = emu.mem.load_u8(emu.cpu.pc+1).wrapping_add(emu.cpu.x);
-        emu.mem.load_u16(addr as u16)
+        let r = emu.mem.load_u8(addr as u16) as u16 | ((emu.mem.load_u8(addr.wrapping_add(1) as u16) as u16) << 8) as u16;
+        debug!("(${:02x},X) @ {:02x} = {:04x} = {:02x}", emu.mem.load_u8(emu.cpu.pc+1), addr, r, emu.mem.load_u8(r));
+        r
     }
     #[inline]
     pub fn indirect_y(emu: &Emu) -> u16 {
         let addr = emu.mem.load_u8(emu.cpu.pc+1);
-        emu.mem.load_u16(addr as u16).wrapping_add(emu.cpu.y as u16)
+        let r = emu.mem.load_u8(addr as u16) as u16 | ((emu.mem.load_u8(addr.wrapping_add(1) as u16) as u16) << 8) as u16;
+        let r = r.wrapping_add(emu.cpu.y as u16);
+        debug!("(${:02x}),Y = {:04x} @ {:04x} = {:02x}", emu.mem.load_u8(emu.cpu.pc+1), emu.mem.load_u16(addr as u16), r, emu.mem.load_u8(r));
+        r
     }
     #[inline]
     pub fn relative(emu: &Emu) -> u16 {
-        (emu.cpu.pc as i16 + 2 + ((emu.mem.load_u8(emu.cpu.pc+1) as i8) as i16)) as u16
+        let r = (emu.cpu.pc as i16 + 2 + ((emu.mem.load_u8(emu.cpu.pc+1) as i8) as i16)) as u16;
+        debug!("${:04x}", r);
+        r
     }
 } // mod addressing
 
@@ -115,21 +140,22 @@ use crate::emu::Emu;
 #[inline]
 pub fn push_u8 (emu: &mut Emu, val: u8) {
     emu.mem.store_u8(emu.cpu.stack_ptr(), val);
-    emu.cpu.s -= 1;
+    emu.cpu.s = emu.cpu.s.wrapping_sub(1);
 }
 #[inline]
 pub fn pop_u8 (emu: &mut Emu) -> u8 {
-    emu.cpu.s += 1;
+    emu.cpu.s = emu.cpu.s.wrapping_add(1);
     emu.mem.load_u8(emu.cpu.stack_ptr())
 }
 #[inline]
 pub fn push_u16 (emu: &mut Emu, val: u16) {
-    emu.mem.store_u16(emu.cpu.stack_ptr(), val);
-    emu.cpu.s -= 2;
+    push_u8(emu, (val >> 8) as u8);
+    push_u8(emu, (val & 0xFF) as u8);
 }
 pub fn pop_u16 (emu: &mut Emu) -> u16 {
-    emu.cpu.s += 2;
-    emu.mem.load_u16(emu.cpu.stack_ptr())
+    let l = pop_u8(emu) as u16;
+    let h = pop_u8(emu) as u16;
+    h << 8 | l
 }
 } // mod stack
 
@@ -144,7 +170,9 @@ fn branch(emu: &mut Emu, cond: bool) {
         }
 }
 
-pub fn  undef(_emu: &mut Emu) {
+pub fn  undef(emu: &mut Emu) {
+    println!("undefined opcode {:04X} {:02X}", emu.cpu.pc, emu.mem.load_u8(emu.cpu.pc) );
+    emu.cpu.pc += 1;
 }
 pub fn  brk (emu: &mut Emu) {
     stack::push_u16(emu, emu.cpu.pc + 1);
@@ -160,7 +188,7 @@ pub fn nop (emu: &mut Emu) {
 pub fn  adc(emu: &mut Emu, val: u8) {
     let (r_a, v_a) = emu.cpu.a.overflowing_add(val);
     let (r_c, v_c) = r_a.overflowing_add(emu.cpu.sp.contains(Flags::C).into());
-    emu.cpu.overflow_flag((r_c ^ emu.cpu.a) & 0x80 != 0);
+    emu.cpu.overflow_flag((val ^ r_c) & (r_c ^ emu.cpu.a) & 0x80 != 0);
     emu.cpu.a = r_c;
     emu.cpu.carry_flag(v_a || v_c);
     emu.cpu.nz_flags(emu.cpu.a);
@@ -173,14 +201,14 @@ pub fn  and(emu: &mut Emu, val: u8) {
 #[inline]
 pub fn  asl(emu: &mut Emu, addr: u16) {
     let val = emu.mem.load_u8(addr);
-    emu.cpu.carry_flag(val & 0x40 != 0);
-    emu.mem.store_u8(addr, (val as i8).shl(1) as u8);
-    emu.cpu.nz_flags(emu.cpu.a);
+    emu.cpu.carry_flag(val & 0x80 != 0);
+    emu.mem.store_u8(addr, val << 1);
+    emu.cpu.nz_flags(val << 1);
 }
 pub fn  asl_i(emu: &mut Emu) {
     let val = emu.cpu.a;
-    emu.cpu.carry_flag(val & 0x40 != 0);
-    emu.cpu.a = (val as i8).shl(1) as u8;
+    emu.cpu.carry_flag(val & 0x80 != 0);
+    emu.cpu.a = val << 1;
     emu.cpu.nz_flags(emu.cpu.a);
     emu.cpu.pc += 1;
 }
@@ -257,7 +285,7 @@ pub fn  lsr (emu: &mut Emu, addr: u16) {
     let val = emu.mem.load_u8(addr);
     emu.cpu.carry_flag(val & 0x01 != 0);
     emu.mem.store_u8(addr, val >> 1);
-    emu.cpu.nz_flags(emu.cpu.a);
+    emu.cpu.nz_flags(val >> 1);
 }
 #[inline]
 pub fn  ora(emu: &mut Emu, val: u8) { 
@@ -270,7 +298,7 @@ pub fn  rol(emu: &mut Emu, addr: u16) {
     let c = emu.cpu.sp.contains(Flags::C) as u8;
     emu.cpu.carry_flag(val & 0x80 != 0);
     emu.mem.store_u8(addr, (val << 1) | c);
-    emu.cpu.nz_flags(emu.cpu.a);
+    emu.cpu.nz_flags((val << 1) | c);
 }
 #[inline]
 pub fn  ror(emu: &mut Emu, addr: u16) {
@@ -278,15 +306,15 @@ pub fn  ror(emu: &mut Emu, addr: u16) {
     let c = emu.cpu.sp.contains(Flags::C) as u8;
     emu.cpu.carry_flag(val & 0x01 != 0);
     emu.mem.store_u8(addr, (val >> 1) | (c << 7));
-    emu.cpu.nz_flags(emu.cpu.a);
+    emu.cpu.nz_flags((val >> 1) | (c << 7));
 }
 #[inline]
 pub fn  sbc(emu: &mut Emu, val: u8) {
-    let (r_a, v_a) = emu.cpu.a.overflowing_sub(val);
-    let (r_c, v_c) = r_a.overflowing_sub((!emu.cpu.sp.contains(Flags::C)).into());
-    emu.cpu.overflow_flag((r_c ^ emu.cpu.a) & 0x80 != 0);
+    let (r_a, v_a) = emu.cpu.a.overflowing_add(val.not());
+    let (r_c, v_c) = r_a.overflowing_add(emu.cpu.sp.contains(Flags::C).into());
+    emu.cpu.overflow_flag((r_c ^ !val) & (r_c ^ emu.cpu.a) & 0x80 != 0);
     emu.cpu.a = r_c;
-    emu.cpu.carry_flag(!(v_a || v_c));
+    emu.cpu.carry_flag(v_a || v_c);
     emu.cpu.nz_flags(emu.cpu.a);
 }
 
@@ -301,8 +329,8 @@ pub fn  tay_i (emu: &mut Emu) {
     emu.cpu.pc += 1;
 }
 pub fn  tsx_i (emu: &mut Emu) {
-    emu.cpu.x = emu.cpu.sp.bits();
-    emu.cpu.nz_flags(emu.cpu.sp.bits());
+    emu.cpu.x = emu.cpu.s;
+    emu.cpu.nz_flags(emu.cpu.s);
     emu.cpu.pc += 1;
 }
 pub fn  txa_i (emu: &mut Emu) {
@@ -311,8 +339,7 @@ pub fn  txa_i (emu: &mut Emu) {
     emu.cpu.pc += 1;
 }
 pub fn  txs_i (emu: &mut Emu) {
-    emu.cpu.sp = Flags::from_bits(emu.cpu.x).unwrap();
-    emu.cpu.nz_flags(emu.cpu.x);
+    emu.cpu.s = emu.cpu.x;
     emu.cpu.pc += 1;
 }
 pub fn  tya_i (emu: &mut Emu) {
@@ -366,7 +393,7 @@ pub fn  pha_i (emu: &mut Emu) {
     emu.cpu.pc += 1;
 }
 pub fn  php_i (emu: &mut Emu) {
-    stack::push_u8(emu, emu.cpu.sp.bits());
+    stack::push_u8(emu, emu.cpu.sp.bits() | Flags::A.bits() | Flags::B.bits());
     emu.cpu.pc += 1;
 }
 pub fn  pla_i (emu: &mut Emu) {
@@ -375,14 +402,21 @@ pub fn  pla_i (emu: &mut Emu) {
     emu.cpu.pc += 1;
 }
 pub fn  plp_i (emu: &mut Emu) {
-    emu.cpu.sp = Flags::from_bits(stack::pop_u8(emu)).unwrap();
+    emu.cpu.sp = Flags::from_bits((stack::pop_u8(emu) | Flags::A.bits()) & Flags::B.bits().not()).unwrap();
     emu.cpu.pc += 1;
 }
 pub fn  jmp_abs(emu: &mut Emu) {
     emu.cpu.pc = addressing::absolute(emu);
 }
 pub fn  jmp_ind(emu: &mut Emu) {
-    emu.cpu.pc = emu.mem.load_u16(emu.mem.load_u16(emu.cpu.pc+1));
+    let r = addressing::absolute(emu);
+    if r & 0x00ff == 0x00ff {
+        let l = emu.mem.load_u8(r);
+        let h = emu.mem.load_u8(r & 0xff00);
+        emu.cpu.pc = (h as u16) << 8 | (l as u16);
+    } else {
+        emu.cpu.pc = emu.mem.load_u16(r);
+    }
 }
 pub fn  jsr_abs(emu: &mut Emu) {
     let ret = emu.cpu.pc + 2;
@@ -393,7 +427,7 @@ pub fn  rts_i(emu: &mut Emu) {
     emu.cpu.pc = stack::pop_u16(emu) + 1;
 }
 pub fn  rti_i(emu: &mut Emu) {
-    emu.cpu.sp = Flags::from_bits(stack::pop_u8(emu)).unwrap();
+    emu.cpu.sp = Flags::from_bits(stack::pop_u8(emu) | 0x20).unwrap();
     emu.cpu.pc = stack::pop_u16(emu);
 }
 pub fn  bcc_rel(emu: &mut Emu) {
@@ -428,6 +462,11 @@ pub fn cli_i(emu: &mut Emu) {
     emu.cpu.interrupt_flag(false);
     emu.cpu.pc += 1;
 }
+
+pub fn cld_i(emu: &mut Emu) {
+    emu.cpu.decimal_flag(false);
+    emu.cpu.pc += 1;
+}
 pub fn clv_i(emu: &mut Emu) {
     emu.cpu.overflow_flag(false);
     emu.cpu.pc += 1;
@@ -440,7 +479,10 @@ pub fn sei_i(emu: &mut Emu) {
     emu.cpu.interrupt_flag(true);
     emu.cpu.pc += 1;
 }
-
+pub fn sed_i(emu: &mut Emu) {
+    emu.cpu.decimal_flag(true);
+    emu.cpu.pc += 1;
+}
 pub fn lda_imm(emu: &mut Emu) { 
     lda(emu, emu.mem.load_u8(addressing::immediate(emu))); 
     emu.cpu.pc += 2;

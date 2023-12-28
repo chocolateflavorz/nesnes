@@ -10,7 +10,7 @@ const PPU_RAM_MIRROR_END: u16 = 0x3fff;
 const PRG_ROM_ZERO: u16 = 0x8000;
 const PRG_ROM_END: u16 = 0xffff;
 pub struct Mem {
-    pub(crate) mem: [u8; RAM_SIZE],
+    pub mem: [u8; RAM_SIZE],
     rom: Rom
 }
 
@@ -92,6 +92,6 @@ impl Mem {
     #[inline]
     pub fn load_u16(&self, addr: u16) -> u16 {
         let p = Self::translate_address_r(self, addr);
-        p[0] as u16 | (p[1] as u16) << 8
+        p[0] as u16 | ((p[1] as u16) << 8)
     }
 }

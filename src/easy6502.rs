@@ -104,7 +104,7 @@ impl Emu {
                 keys.contains(&Keycode::Escape)
                     .then(|| breaking = true);
                 if (!breaking) {
-                    Emu::run_cpu_clocks(&mut self, 256);
+                    self.run_cpu_clocks(256);
                     self.render_easy(pixels.frame_mut());
                     pixels.render().expect("render failed");
                     sleep(Duration::from_millis(10));
