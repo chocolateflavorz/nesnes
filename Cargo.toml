@@ -18,3 +18,4 @@ log = "0.4"
 flexi_logger = { version = "0.27", features = ["async"] }
 rand = { version = "0.8", features = ["small_rng"] }
 clap = { version = "4.3", features = ["derive"] }
+softbuffer = "0.4"
