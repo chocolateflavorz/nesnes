@@ -78,17 +78,14 @@ impl Emu {
         debug!("{:04X} {:02X} A:{:02X} X:{:02X} Y:{:02X} P:{:02X} SP:{:02X}",
         emu.cpu.pc, op, emu.cpu.a, emu.cpu.x, emu.cpu.y, emu.cpu.sp.bits(), emu.cpu.s);
     }
+
     pub fn run_cpu_with_callback(&mut self, inst: u32, callback: fn(&Emu)) {
         for _ in 0..inst {
             callback(self);
             self.run_cpu_once();
         }
-
-        use pretty_hex::*;
-        use std::io::Write;
-        let mut file = std::fs::File::create("foo.txt").unwrap();
-        file.write(format!("{:?}", self.mem.mem[0x000..0xffff].hex_dump()).to_string().as_bytes()).expect("FUCKWRITER");
     }
+
     pub fn run_cpu_once(&mut self) {
         let op = self.mem.load_u8(self.cpu.pc);
         let f = OP_FUNC[op as usize];

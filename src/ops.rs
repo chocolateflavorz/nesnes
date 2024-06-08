@@ -318,6 +318,7 @@ pub fn  sbc(emu: &mut Emu, val: u8) {
     emu.cpu.nz_flags(emu.cpu.a);
 }
 
+// ops with addressing mode
 pub fn  tax_i (emu: &mut Emu) {
     emu.cpu.x = emu.cpu.a;
     emu.cpu.nz_flags(emu.cpu.a);

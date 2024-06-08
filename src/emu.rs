@@ -1,5 +1,7 @@
 use crate::cart::Rom;
-use crate::{cpu::Cpu, mem::Mem};
+use crate::cpu::Cpu;
+use crate::mem::Mem;
+use crate::ppu::Ppu;
 
 use log::debug;
 use std::thread::sleep;
@@ -20,6 +22,7 @@ const SCALE: f64 = 30.0;
 pub struct Emu {
     pub stat: Stat,
     pub cpu: Cpu,
+    pub ppu: Ppu,
     pub mem: Mem,
 }
 
@@ -34,6 +37,7 @@ impl Default for Emu {
         Emu {
             stat: Stat::new(),
             cpu: Cpu::default(),
+            ppu: Ppu::default(),
             mem: Mem::default(),
         }
     }
@@ -56,8 +60,15 @@ impl Emu {
                 self.mem.set_rom(rom);
             }
             Err(e) => {
-                panic!("error when loading rom : {}", e);
+                panic!("loading rom error. {}", e);
             }
         }
+    }
+
+    pub fn memory_map_to_foo(&self) {
+        use pretty_hex::*;
+        use std::io::Write;
+        let mut file = std::fs::File::create("foo.txt").unwrap();
+        file.write(format!("{:?}", self.mem.mem[0x000..0xffff].hex_dump()).to_string().as_bytes()).expect("FUCKWRITER");
     }
 }

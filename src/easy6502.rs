@@ -106,7 +106,7 @@ impl Emu {
                 if (!breaking) {
                     self.run_cpu_clocks(256);
                     self.render_easy(pixels.frame_mut());
-                    pixels.render().expect("render failed");
+                    pixels.render().expect("rendering is failed");
                     sleep(Duration::from_millis(10));
                 } else {
                     use pretty_hex::*;
