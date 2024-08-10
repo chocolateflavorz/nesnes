@@ -1,31 +1,72 @@
 use bitflags::bitflags;
-use log::debug;
-use log::info;
-
-use crate::cart::Mirroring::*;
 use crate::cart::*;
-use crate::emu::Emu;
+use crate::mem::Mem;
 
 pub struct Ppu {
-    rom: Box<Rom>,
-    vram: [u8; 0x800],
-    oam: [u8; 0x100],
+    mem: Box<Mem>,
     palette: [u8; 32],
-    address_register: PpuAddressRegister,
+    addr: PpuAddressRegister,
+    pub ctrl: ControlRegister,
+    internal_data_buf: u8,
 }
 
 impl Ppu {
-    fn new(rom: Box<Rom>) -> Self {
+    pub fn new(mem: Box<Mem>) -> Self {
         Ppu {
-            rom: rom,
-            vram: [0; 0x800],
-            oam: [0; 0x100],
+            mem: mem,
             palette: [0; 32],
+            addr: PpuAddressRegister::new(),
+            ctrl: ControlRegister::new(),
+            internal_data_buf: 0,
         }
     }
 
     fn write_to_address_register(&mut self, data: u8) {
-        self.address_register.update(data);
+        self.addr.update(data);
+    }
+
+    pub fn write_to_control_register(&mut self, val: u8) {
+        self.ctrl.update(val);
+    }
+    fn increment_vram_addr(&mut self) {
+        self.addr.increment(self.ctrl.vram_addr_increment());
+    }
+
+    fn read_data(&mut self) -> u8 {
+        let addr = self.addr.get();
+        self.increment_vram_addr();
+
+        match addr {
+            0..=0x1fff => {
+                let result = self.internal_data_buf;
+                self.internal_data_buf = self.mem.rom.chr_rom[addr as usize];
+                result
+            }
+            0x2000..=0x2fff => {
+                let result = self.internal_data_buf;
+                self.internal_data_buf = self.mem.vram[self.mirror_vram_addr(addr) as usize];
+                result
+            }
+            0x3000..=0x3eff => panic!(
+                "addr space 0x3000..0x3eff is not expected to be used, requested = {} ",
+                addr
+            ),
+            0x3f00..=0x3fff => self.palette[(addr - 0x3f00) as usize],
+            _ => panic!("unexpected access to mirrored space {}", addr),
+        }
+    }
+
+    pub fn mirror_vram_addr(&self, addr: u16) -> u16 {
+        let mirrored_vram = addr & 0b10111111111111; // mirror down 0x3000-0x3eff to 0x2000 - 0x2eff
+        let vram_index = mirrored_vram - 0x2000; // to vram vector
+        let name_table = vram_index / 0x400; // to the name table index
+        match (&self.mem.rom.screen_mirroring, name_table) {
+            (Mirroring::VERTICAL, 2) | (Mirroring::VERTICAL, 3) => vram_index - 0x800,
+            (Mirroring::HORIZONTAL, 2) => vram_index - 0x400,
+            (Mirroring::HORIZONTAL, 1) => vram_index - 0x400,
+            (Mirroring::HORIZONTAL, 3) => vram_index - 0x800,
+            _ => vram_index,
+        }
     }
 }
 
@@ -60,6 +101,10 @@ impl PpuAddressRegister {
     pub fn reset_latch(&mut self) {
         self.hi_ptr = true;
     }
+
+    pub fn get(&self) -> u16 {
+        ((self.value as u16) << 8) | (self.value as u16)
+    }
 }
 
 bitflags! {
@@ -89,6 +134,6 @@ impl ControlRegister {
     }
 
     pub fn update(&mut self, data: u8) {
-        self.bits = data;
+        self.insert(ControlRegister::from_bits_truncate(data));
     }
 }

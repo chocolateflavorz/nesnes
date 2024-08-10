@@ -5,3 +5,5 @@ pub mod mem;
 pub mod ops;
 pub mod ppu;
 pub mod cart;
+pub mod bus;
+

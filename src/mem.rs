@@ -9,20 +9,26 @@ const PPU_RAM_ADDR_MASK: u16 = 0x2007;
 const PPU_RAM_MIRROR_END: u16 = 0x3fff;
 const PRG_ROM_ZERO: u16 = 0x8000;
 const PRG_ROM_END: u16 = 0xffff;
+
 pub struct Mem {
     pub mem: [u8; RAM_SIZE],
-    rom: Rom
+    pub vram: [u8; 0x800],
+    pub oam: [u8; 0x100],
+    pub rom: Rom,
 }
 
 impl Default for Mem {
     fn default() -> Self {
-        Mem { mem: [0; RAM_SIZE],
-                rom: Rom::nothing()
+        Mem {
+            mem: [0; RAM_SIZE],
+            rom: Rom::nothing(),
+            vram: [0; 0x800],
+            oam: [0; 0x100],
         }
     }
 }
 
-impl Mem { 
+impl Mem {
     pub fn set_rom(&mut self, rom: Rom) {
         self.rom = rom;
     }
@@ -30,21 +36,21 @@ impl Mem {
     pub fn translate_address_w(&mut self, addr: u16) -> &mut [u8] {
         match addr {
             CPU_RAM_ZERO..=CPU_RAM_MIRROR_END => {
-                &mut self.mem[addr as usize & CPU_RAM_ADDR_MASK as usize..] 
-            },
+                &mut self.mem[addr as usize & CPU_RAM_ADDR_MASK as usize..]
+            }
             PPU_RAM_ZERO..=PPU_RAM_MIRROR_END => {
-                &mut self.mem[addr as usize  & PPU_RAM_ADDR_MASK as usize..]
-            },
+                &mut self.mem[addr as usize & PPU_RAM_ADDR_MASK as usize..]
+            }
             PRG_ROM_ZERO..=PRG_ROM_END => {
                 let mut addr = addr - PRG_ROM_ZERO;
                 if self.rom.prg_rom.len() == 0x4000 && (addr & 0x4000 == 0x4000) {
                     addr = addr ^ 0x4000;
                 }
                 &mut self.rom.prg_rom[addr as usize..]
-            },
+            }
             _ => {
                 panic!("illegal address translation occured at: {:04x}", addr)
-            },
+            }
         }
     }
 
@@ -52,21 +58,21 @@ impl Mem {
     pub fn translate_address_r(&self, addr: u16) -> &[u8] {
         match addr {
             CPU_RAM_ZERO..=CPU_RAM_MIRROR_END => {
-                &self.mem[addr as usize & CPU_RAM_ADDR_MASK as usize..] 
-            },
+                &self.mem[addr as usize & CPU_RAM_ADDR_MASK as usize..]
+            }
             PPU_RAM_ZERO..=PPU_RAM_MIRROR_END => {
-                &self.mem[addr as usize  & PPU_RAM_ADDR_MASK as usize..]
-            },
+                &self.mem[addr as usize & PPU_RAM_ADDR_MASK as usize..]
+            }
             PRG_ROM_ZERO..=PRG_ROM_END => {
                 let mut addr = addr - PRG_ROM_ZERO;
                 if self.rom.prg_rom.len() == 0x4000 && (addr & 0x4000 == 0x4000) {
                     addr = addr ^ 0x4000;
                 }
                 &self.rom.prg_rom[addr as usize..]
-            },
+            }
             _ => {
                 panic!("illegal address translation occured at: {:04x}", addr)
-            },
+            }
         }
     }
     #[inline]
@@ -94,4 +100,7 @@ impl Mem {
         let p = Self::translate_address_r(self, addr);
         p[0] as u16 | ((p[1] as u16) << 8)
     }
-}
+
+    }
+
+

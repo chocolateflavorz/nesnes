@@ -34,11 +34,12 @@ pub struct Stat {
 
 impl Default for Emu {
     fn default() -> Self {
+        let mem = Mem::new();
         Emu {
             stat: Stat::new(),
             cpu: Cpu::default(),
-            ppu: Ppu::default(),
-            mem: Mem::default(),
+            ppu: Ppu::new( Box::new(mem)),
+            mem,
         }
     }
 }
