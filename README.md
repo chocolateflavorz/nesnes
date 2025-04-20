@@ -1,4 +1,4 @@
-nesnes
+#nesnes
 
 A NES emulator written in Rust.
 
