@@ -1,5 +1,9 @@
-#nesnes
+# nesnes
 
+## description
 A NES emulator written in Rust.
 
-Thanks for the great tutorial [https://bugzmanov.github.io/nes_ebook/].
+Thanks for the great tutorial! [https://bugzmanov.github.io/nes_ebook/].
+
+## license
+unlicensed 
